@@ -1,0 +1,11 @@
+$main: #48af32;
+$secondary: #1297ef;
+$error: #e75454;
+$warning: #ffa700;
+
+:export {
+  main: $main;
+  secondary: $secondary;
+  error: $error;
+  warning: $warning;
+}
