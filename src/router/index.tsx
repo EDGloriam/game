@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
-import Game from 'pages/Game';
+import Home from 'pages/Home';
 import Typography from 'pages/Typography';
 import NotFound from 'pages/NotFound';
 
@@ -13,7 +13,7 @@ export const routes = {
 export const router = createBrowserRouter([
   {
     path: routes.home,
-    element: <Game />,
+    element: <Home />,
   },
   {
     path: routes.typography,

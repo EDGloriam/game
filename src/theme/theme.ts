@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
 import 'assets/fonts/Montserrat/style.scss';
-// @ts-ignore
+// @ts-ignore TODO
 import palette from 'theme/palette.module.scss';
 
 export const theme = createTheme({
@@ -11,6 +11,12 @@ export const theme = createTheme({
     },
     secondary: {
       main: palette.secondary,
+    },
+    warning: {
+      main: palette.warning,
+    },
+    error: {
+      main: palette.error,
     },
   },
   typography: {
