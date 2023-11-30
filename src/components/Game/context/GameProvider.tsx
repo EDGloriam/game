@@ -11,8 +11,8 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react';
-import { getInitialPositions } from '../../../helpers/getInitialPositions';
-import { useInterval } from '../hook/useInterval';
+import { getInitialPositions } from 'helpers/getInitialPositions';
+import { useInterval } from 'components/Game/hook/useInterval';
 
 export type Position = {
   col: number;
@@ -33,8 +33,9 @@ interface GameContextType {
   score: Score;
   setScore: Dispatch<SetStateAction<Score>>;
   roundDuration: string;
-  roundDurationChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
+  setRoundDuration: Dispatch<SetStateAction<string>>;
   startHandler: () => void;
+  stopGameHandler: () => void;
   resetHandler: () => void;
   gameIsRunning: boolean;
   cellsPositions: Array<Position>;
@@ -52,9 +53,12 @@ const initialScore = {
 export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [score, setScore] = useState<Score>(initialScore);
   const [gameIsRunning, setGameIsRunning] = useState(false);
-  const [roundDuration, setRoundDuration] = useState<string>('2000');
+  const [roundDuration, setRoundDuration] = useState<string>('');
   const [nextIndex, setNextIndex] = useState(0);
-  const { roundIntervalId, start } = useInterval(setNextIndex);
+  const { roundIntervalId, startGame, stopGame } = useInterval(
+    setNextIndex,
+    roundDuration,
+  );
   const [cellsPositions, setCellPositions] = useState<Array<Position>>(
     getInitialPositions(),
   );
@@ -68,7 +72,12 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
 
   const startHandler = () => {
     setGameIsRunning(true);
-    start();
+    startGame();
+  };
+
+  const stopGameHandler = () => {
+    setGameIsRunning(false);
+    stopGame();
   };
 
   useEffect(() => {
@@ -87,35 +96,30 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     }
   }, [nextIndex, gameIsRunning]);
 
-  const roundDurationChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    // TODO add validation. Should be number
-    setRoundDuration(event.target.value);
-  };
-
   const contextValue = useMemo(
     () => ({
       score,
-      // roundIntervalId,
       roundDuration,
-      roundDurationChangeHandler,
+      setRoundDuration,
       startHandler,
       resetHandler,
       gameIsRunning,
       cellsPositions,
       setCellPositions,
       setScore,
+      stopGameHandler,
     }),
     [
       score,
-      // roundIntervalId,
       roundDuration,
-      roundDurationChangeHandler,
+      setRoundDuration,
       startHandler,
       resetHandler,
       gameIsRunning,
       cellsPositions,
       setCellPositions,
       setScore,
+      stopGameHandler,
     ],
   );
 

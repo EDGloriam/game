@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useGameContext } from '../Game/context/GameProvider';
+
+import { useGameContext } from 'components/Game/context/GameProvider';
 
 export enum CellStatus {
   default = 'default',
@@ -45,7 +46,8 @@ interface CellProps {
 
 const Cell: FC<CellProps> = ({ col, row }) => {
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { score, roundDuration, cellsPositions, setScore } = useGameContext();
+  const { gameIsRunning, score, roundDuration, cellsPositions, setScore } =
+    useGameContext();
   const stringPositions = JSON.stringify(
     cellsPositions.filter((cell) => cell.initialised),
   );
@@ -55,17 +57,20 @@ const Cell: FC<CellProps> = ({ col, row }) => {
   useEffect(() => {
     if (initialised) {
       setStatus(CellStatus.pending);
+    }
+  }, [initialised]);
+
+  useEffect(() => {
+    if (status === CellStatus.pending && score.skyNet < 9) {
       roundTimeoutId.current = setTimeout(() => {
-        setScore({
-          ...score,
-          skyNet: score.skyNet + 1,
-        });
+        setScore((prevState) => ({
+          ...prevState,
+          skyNet: prevState.skyNet + 1,
+        }));
         setStatus(CellStatus.lose);
       }, Number(roundDuration));
     }
-
-    return () => clearTimeout(roundTimeoutId.current);
-  }, [initialised]);
+  }, [status]);
 
   const clickHandler = () => {
     setStatus(CellStatus.win);
@@ -75,6 +80,12 @@ const Cell: FC<CellProps> = ({ col, row }) => {
     });
     clearTimeout(roundTimeoutId.current);
   };
+
+  useEffect(() => {
+    if (!gameIsRunning) {
+      setStatus(CellStatus.default);
+    }
+  }, [gameIsRunning]);
 
   return (
     <StyledCell

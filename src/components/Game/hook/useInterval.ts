@@ -1,13 +1,21 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 
-export const useInterval = (setNextIndex: Dispatch<SetStateAction<number>>) => {
+export const useInterval = (
+  setNextIndex: Dispatch<SetStateAction<number>>,
+  roundDuration: string,
+) => {
   const roundIntervalId = useRef<ReturnType<typeof setInterval>>();
   const nextIndex = useRef<number>(0);
 
-  const start = () => {
+  const startGame = () => {
+    clearInterval(roundIntervalId.current);
     roundIntervalId.current = setInterval(() => {
       setNextIndex((prevState) => prevState + 1);
-    }, 2000);
+    }, Number(roundDuration));
+  };
+
+  const stopGame = () => {
+    clearInterval(roundIntervalId.current);
   };
 
   useEffect(() => () => clearInterval(roundIntervalId.current), []);
@@ -15,6 +23,7 @@ export const useInterval = (setNextIndex: Dispatch<SetStateAction<number>>) => {
   return {
     nextIndex: nextIndex.current,
     roundIntervalId,
-    start,
+    startGame,
+    stopGame,
   };
 };

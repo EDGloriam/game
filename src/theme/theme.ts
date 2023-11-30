@@ -4,6 +4,19 @@ import 'assets/fonts/Montserrat/style.scss';
 // @ts-ignore TODO
 import palette from 'theme/palette.module.scss';
 
+interface CustomColor {
+  white: string;
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    color: CustomColor;
+  }
+  interface PaletteOptions {
+    color: CustomColor;
+  }
+}
+
 export const theme = createTheme({
   palette: {
     primary: {
@@ -17,6 +30,9 @@ export const theme = createTheme({
     },
     error: {
       main: palette.error,
+    },
+    color: {
+      white: palette.white,
     },
   },
   typography: {
