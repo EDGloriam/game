@@ -46,26 +46,28 @@ interface CellProps {
 
 const Cell: FC<CellProps> = ({ col, row }) => {
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { gameIsRunning, score, roundDuration, cellsPositions, setScore } =
+  const { gameIsRunning, score, roundDuration, cellsParams, setScore } =
     useGameContext();
   const stringPositions = JSON.stringify(
-    cellsPositions.filter((cell) => cell.initialised),
+    cellsParams.filter((cell) => cell.initialised),
   );
   const initialised = stringPositions.includes(`{"col":${col},"row":${row}`);
   const [status, setStatus] = useState(CellStatus.default);
 
   useEffect(() => {
-    if (initialised) {
+    if (initialised && score.player < 10 && score.skyNet < 9) {
       setStatus(CellStatus.pending);
     }
   }, [initialised]);
 
   useEffect(() => {
-    if (status === CellStatus.pending && score.skyNet < 9) {
+    clearTimeout(roundTimeoutId.current);
+    if (status === CellStatus.pending) {
       roundTimeoutId.current = setTimeout(() => {
         setScore((prevState) => ({
           ...prevState,
-          skyNet: prevState.skyNet + 1,
+          skyNet:
+            prevState.skyNet < 10 ? prevState.skyNet + 1 : prevState.skyNet,
         }));
         setStatus(CellStatus.lose);
       }, Number(roundDuration));
@@ -76,13 +78,13 @@ const Cell: FC<CellProps> = ({ col, row }) => {
     setStatus(CellStatus.win);
     setScore({
       ...score,
-      player: score.player + 1,
+      player: score.player < 10 ? score.player + 1 : score.player,
     });
     clearTimeout(roundTimeoutId.current);
   };
 
   useEffect(() => {
-    if (!gameIsRunning) {
+    if (gameIsRunning) {
       setStatus(CellStatus.default);
     }
   }, [gameIsRunning]);

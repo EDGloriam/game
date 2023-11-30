@@ -6,8 +6,6 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useRef,
-  ChangeEvent,
   Dispatch,
   SetStateAction,
 } from 'react';
@@ -38,7 +36,7 @@ interface GameContextType {
   stopGameHandler: () => void;
   resetHandler: () => void;
   gameIsRunning: boolean;
-  cellsPositions: Array<Position>;
+  cellsParams: Array<Position>;
 }
 
 export const GameContext = createContext({} as GameContextType);
@@ -54,19 +52,19 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [score, setScore] = useState<Score>(initialScore);
   const [gameIsRunning, setGameIsRunning] = useState(false);
   const [roundDuration, setRoundDuration] = useState<string>('');
-  const [nextIndex, setNextIndex] = useState(0);
+  const [nextCellIndex, setNextCellIndex] = useState(0);
   const { roundIntervalId, startGame, stopGame } = useInterval(
-    setNextIndex,
+    setNextCellIndex,
     roundDuration,
   );
-  const [cellsPositions, setCellPositions] = useState<Array<Position>>(
+  const [cellsParams, setCellPrams] = useState<Array<Position>>(
     getInitialPositions(),
   );
 
   const resetHandler = () => {
     setGameIsRunning(false);
     clearInterval(roundIntervalId.current);
-    setCellPositions([]);
+    setCellPrams([]);
     setScore(initialScore);
   };
 
@@ -82,9 +80,9 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (gameIsRunning) {
-      setCellPositions((prevState) =>
+      setCellPrams((prevState) =>
         prevState.map((cell, index) => {
-          if (index === nextIndex) {
+          if (index === nextCellIndex) {
             return {
               ...cell,
               initialised: true,
@@ -94,7 +92,9 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
         }),
       );
     }
-  }, [nextIndex, gameIsRunning]);
+  }, [nextCellIndex, gameIsRunning]);
+
+  console.log('n: ', nextCellIndex);
 
   const contextValue = useMemo(
     () => ({
@@ -104,8 +104,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
       startHandler,
       resetHandler,
       gameIsRunning,
-      cellsPositions,
-      setCellPositions,
+      cellsParams,
       setScore,
       stopGameHandler,
     }),
@@ -116,8 +115,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
       startHandler,
       resetHandler,
       gameIsRunning,
-      cellsPositions,
-      setCellPositions,
+      cellsParams,
       setScore,
       stopGameHandler,
     ],

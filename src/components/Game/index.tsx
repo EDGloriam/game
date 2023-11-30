@@ -17,7 +17,7 @@ const schema = yup.object().shape({
   roundDuration: yup
     .string()
     .required('Time is a required field')
-    .matches(/\d+/, 'Only numbers allowed'),
+    .matches(/^\d+$/, 'Only numbers allowed'),
 });
 
 const MainWrapper = styled('div')(({ theme }) => ({
