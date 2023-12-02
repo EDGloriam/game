@@ -1,9 +1,9 @@
-import { generateRandom } from 'helpers/generateRandom';
+import { getRandomIndex } from 'helpers/getRandomIndex';
 
 export const getInitialPositions = () =>
-  Array(20)
+  Array(19)
     .fill(undefined)
-    .reduce((previousValue, currentValue) => {
-      const newCellPosition = generateRandom(previousValue);
-      return [...previousValue, newCellPosition];
+    .reduce((previousValue) => {
+      const newIndexForCell = getRandomIndex(previousValue);
+      return [...previousValue, newIndexForCell];
     }, []);

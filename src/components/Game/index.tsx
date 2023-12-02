@@ -1,12 +1,15 @@
 import React, { ChangeEvent, useEffect, useId, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { styled } from '@mui/material/styles';
 
-import Cell, { CellStatus } from 'components/Cell';
-import { useGameContext } from 'components/Game/context/GameProvider';
+import Cell from 'components/Cell';
+import {
+  GameStates,
+  useGameContext,
+} from 'components/Game/context/GameProvider';
 import Modal from 'components/Modal';
 
 interface IFormInput {
@@ -28,7 +31,8 @@ const MainWrapper = styled('div')(({ theme }) => ({
 }));
 
 const Board = styled('div')(({ theme }) => ({
-  display: 'flex',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(10, 70px)',
   gap: 2,
   marginTop: 10,
 }));
@@ -58,11 +62,11 @@ const Game = () => {
     setRoundDuration,
     startHandler,
     resetHandler,
-    score,
+    allCellsStatuses,
     gameIsRunning,
+    score,
   } = useGameContext();
   const [resultModalIsOpen, setResultModalIsOpen] = useState(false);
-
   const toggleResultModal = () => setResultModalIsOpen(!resultModalIsOpen);
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const Game = () => {
   }, [score]);
 
   const playAgain = () => {
-    resetHandler();
+    startHandler();
     toggleResultModal();
   };
 
@@ -122,7 +126,7 @@ const Game = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {gameIsRunning ? (
+            {gameIsRunning === GameStates.running ? (
               <Button variant="contained" onClick={resetHandler}>
                 Stop & Reset
               </Button>
@@ -135,23 +139,9 @@ const Game = () => {
         </Controls>
       </form>
       <Board>
-        {Array(10)
-          .fill(CellStatus.default)
-          .map((_, row) => {
-            const rowKey = useId();
-
-            return (
-              <Row key={rowKey}>
-                {Array(10)
-                  .fill(CellStatus.default)
-                  .map((__, col) => {
-                    const key = useId();
-
-                    return <Cell key={key} col={col} row={row} />;
-                  })}
-              </Row>
-            );
-          })}
+        {allCellsStatuses.map((status) => (
+          <Cell key={useId()} status={status} />
+        ))}
       </Board>
       <Modal open={resultModalIsOpen} onClose={toggleResultModal}>
         <Typography

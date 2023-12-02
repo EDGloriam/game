@@ -40,60 +40,56 @@ const StyledCell = styled(Button, {
 }));
 
 interface CellProps {
-  col: number;
-  row: number;
+  status: CellStatus;
 }
 
-const Cell: FC<CellProps> = ({ col, row }) => {
+const Cell: FC<CellProps> = ({ status }) => {
+  const [localStatus, setLocalStatus] = useState(status);
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { gameIsRunning, score, roundDuration, cellsParams, setScore } =
-    useGameContext();
-  const stringPositions = JSON.stringify(
-    cellsParams.filter((cell) => cell.initialised),
-  );
-  const initialised = stringPositions.includes(`{"col":${col},"row":${row}`);
-  const [status, setStatus] = useState(CellStatus.default);
+  const { score, setScore, roundDuration } = useGameContext();
 
   useEffect(() => {
-    if (initialised && score.player < 10 && score.skyNet < 9) {
-      setStatus(CellStatus.pending);
-    }
-  }, [initialised]);
-
-  useEffect(() => {
-    clearTimeout(roundTimeoutId.current);
-    if (status === CellStatus.pending) {
-      roundTimeoutId.current = setTimeout(() => {
-        setScore((prevState) => ({
-          ...prevState,
-          skyNet:
-            prevState.skyNet < 10 ? prevState.skyNet + 1 : prevState.skyNet,
-        }));
-        setStatus(CellStatus.lose);
-      }, Number(roundDuration));
+    if (score.skyNet < 9 && score.player < 10) {
+      setLocalStatus(status);
     }
   }, [status]);
 
+  useEffect(() => {
+    if (localStatus === CellStatus.pending) {
+      roundTimeoutId.current = setTimeout(() => {
+        setScore((prevState) => {
+          if (prevState.skyNet < 10) {
+            return {
+              ...prevState,
+              skyNet: prevState.skyNet + 1,
+            };
+          }
+          return prevState;
+        });
+        setLocalStatus(CellStatus.lose);
+      }, Number(roundDuration));
+    }
+  }, [localStatus]);
+
   const clickHandler = () => {
-    setStatus(CellStatus.win);
-    setScore({
-      ...score,
-      player: score.player < 10 ? score.player + 1 : score.player,
+    setLocalStatus(CellStatus.win);
+    setScore((prevState) => {
+      if (prevState.player < 10) {
+        return {
+          ...prevState,
+          player: prevState.player + 1,
+        };
+      }
+      return prevState;
     });
     clearTimeout(roundTimeoutId.current);
   };
 
-  useEffect(() => {
-    if (gameIsRunning) {
-      setStatus(CellStatus.default);
-    }
-  }, [gameIsRunning]);
-
   return (
     <StyledCell
-      status={status}
+      status={localStatus}
       onClick={clickHandler}
-      disabled={status !== CellStatus.pending}
+      disabled={localStatus !== CellStatus.pending}
     />
   );
 };
