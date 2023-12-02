@@ -6,10 +6,7 @@ import * as yup from 'yup';
 import { styled } from '@mui/material/styles';
 
 import Cell from 'components/Cell';
-import {
-  GameStates,
-  useGameContext,
-} from 'components/Game/context/GameProvider';
+import { useGameContext } from 'components/Game/context/GameProvider';
 import Modal from 'components/Modal';
 
 interface IFormInput {
@@ -126,7 +123,7 @@ const Game = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {gameIsRunning === GameStates.running ? (
+            {gameIsRunning ? (
               <Button variant="contained" onClick={resetHandler}>
                 Stop & Reset
               </Button>

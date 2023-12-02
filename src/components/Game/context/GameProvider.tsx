@@ -6,7 +6,8 @@ import {
   SetStateAction,
   useContext,
   useEffect,
-  useMemo, useRef,
+  useMemo,
+  useRef,
   useState,
 } from 'react';
 import { getInitialPositions } from 'helpers/getInitialPositions';
@@ -21,12 +22,6 @@ export type Score = {
   skyNet: number;
 };
 
-export enum GameStates {
-  running = 'running',
-  pending = 'pending',
-  stopped = 'stopped',
-}
-
 interface GameContextType {
   score: Score;
   setScore: Dispatch<SetStateAction<Score>>;
@@ -38,7 +33,7 @@ interface GameContextType {
   startHandler: () => void;
   stopGameHandler: () => void;
   resetHandler: () => void;
-  gameIsRunning: GameStates;
+  gameIsRunning: boolean;
 }
 
 export const GameContext = createContext({} as GameContextType);
@@ -64,26 +59,23 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [cellsForGame, setCellsForGame] = useState<number[]>(
     getInitialPositions(),
   );
-  const [gameIsRunning, setGameIsRunning] = useState<GameStates>(
-    GameStates.stopped,
-  );
-  // const gameIntervalId = useRef<ReturnType<typeof setInterval>>();
+  const [gameIsRunning, setGameIsRunning] = useState(false);
+  const gameIsRunningRef = useRef(true);
 
   const [roundDuration, setRoundDuration] = useState<string>('');
 
   const resetHandler = () => {
     setScore(initialScore);
-    setGameIsRunning(GameStates.pending);
+    setGameIsRunning(false);
     setAllCellsStatuses(initialCells);
   };
 
   const stopGameHandler = () => {
-    setGameIsRunning(GameStates.pending);
+    setGameIsRunning(false);
   };
 
   const roundHandler = () => {
     const currentCellIndex = cellsForGame.shift();
-    console.log('NEXT ROUND');
     setAllCellsStatuses((prevState) =>
       prevState.map((cell, index) => {
         if (index === currentCellIndex) {
@@ -95,30 +87,26 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     );
   };
 
-  const gameLoop = async (runOrStop: GameStates) => {
-    while (runOrStop === GameStates.running) {
-      console.log('in loop: ', gameIsRunning);
-      // eslint-disable-next-line no-await-in-loop
-      await delay(Number(roundDuration));
-      roundHandler();
-    }
-  };
-  gameLoop(gameIsRunning);
-
   const startHandler = () => {
-    setGameIsRunning(GameStates.running);
-    // round.current.id = setInterval(roundHandler, Number(roundDuration));
+    setGameIsRunning(true);
   };
 
-  // console.log('OUTSIDE:', gameIsRunning);
-  // useEffect(() => {
-  //   console.log('USE_EFFECT:', gameIsRunning);
-  //
-  // }, [gameIsRunning]);
+  useEffect(() => {
+    if (score.player === 10 || score.skyNet === 10) {
+      gameIsRunningRef.current = false;
+    }
+  }, [score]);
 
-  useEffect(() => () => {
-    setGameIsRunning(GameStates.stopped);
-  });
+  useEffect(() => {
+    const gameLoop = async () => {
+      while (gameIsRunningRef.current && gameIsRunning) {
+        // eslint-disable-next-line no-await-in-loop
+        await delay(Number(roundDuration));
+        roundHandler();
+      }
+    };
+    gameLoop();
+  }, [gameIsRunning]);
 
   const contextValue = useMemo(
     () => ({
