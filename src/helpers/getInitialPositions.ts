@@ -1,4 +1,4 @@
-import { getRandomIndex } from './getRandomIndex';
+import { getRandomIndex } from 'helpers/getRandomIndex';
 
 export const getInitialPositions = (size: number = 20) =>
   Array(size)

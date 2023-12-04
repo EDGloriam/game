@@ -4,6 +4,7 @@ import {
   FC,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -11,9 +12,10 @@ import {
   useState,
 } from 'react';
 
-import { getInitialPositions } from 'helpers/getInitialPositions';
-import { delay } from 'helpers/delay';
 import { CellStatus } from 'components/Cell';
+import { useGame } from '../hook/useGame';
+import { getInitialPositions } from '../../../helpers/getInitialPositions';
+import { delay } from '../../../helpers/delay';
 
 interface GameProviderProps {
   children?: ReactNode;
@@ -56,6 +58,18 @@ const initialScore = {
 const initialCells = Array(100).fill(CellStatus.default);
 
 export const GameProvider: FC<GameProviderProps> = ({ children }) => {
+  // const {
+  //   allCellsStatuses,
+  //   setAllCellsStatuses,
+  //   roundDuration,
+  //   setRoundDuration,
+  //   startHandler,
+  //   resetHandler,
+  //   gameStatus,
+  //   stopGameHandler,
+  //   score,
+  //   setScore,
+  // } = useGame();
   const [score, setScore] = useState<Score>(initialScore);
   const [allCellsStatuses, setAllCellsStatuses] =
     useState<CellStatus[]>(initialCells);
@@ -69,10 +83,10 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
 
   const [roundDuration, setRoundDuration] = useState<number | undefined>();
 
-  const resetHandler = () => {
+  const resetHandler = useCallback(() => {
     setGameStatus(GameStatuses.pending);
     gameIsRunningRef.current = false;
-  };
+  }, []);
 
   useEffect(() => {
     if (gameStatus === GameStatuses.pending) {
@@ -82,9 +96,9 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     }
   }, [gameStatus]);
 
-  const stopGameHandler = () => {
+  const stopGameHandler = useCallback(() => {
     setGameStatus(GameStatuses.stopped);
-  };
+  }, []);
 
   const roundHandler = () => {
     const currentCellIndex = cellsForGame.shift();
@@ -99,10 +113,10 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     );
   };
 
-  const startHandler = () => {
+  const startHandler = useCallback(() => {
     gameIsRunningRef.current = true;
     setGameStatus(GameStatuses.running);
-  };
+  }, []);
 
   useEffect(() => {
     if (score.player === 10 || score.skyNet === 10) {

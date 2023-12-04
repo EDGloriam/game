@@ -101,6 +101,7 @@ const Cell: FC<CellProps> = ({ status }) => {
 
   return (
     <StyledCell
+      data-testid="cell"
       status={localStatus}
       onClick={clickHandler}
       disabled={localStatus !== CellStatus.pending}
