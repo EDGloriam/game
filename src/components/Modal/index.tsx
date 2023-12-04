@@ -33,10 +33,7 @@ const Modal: ModalComponent = (props) => {
   const { children } = props;
 
   return (
-    <MuiModal
-      {...props}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description">
+    <MuiModal {...props}>
       <Content>{children}</Content>
     </MuiModal>
   );

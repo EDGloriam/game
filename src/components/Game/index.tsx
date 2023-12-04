@@ -54,44 +54,33 @@ const Controls = styled('div')(({ theme }) => ({
 
 const Game = () => {
   const {
-    watch,
-    register,
     control,
-    handleSubmit,
     trigger,
-    getValues,
     formState: { errors, isValid },
   } = useForm<IFormInput>({ resolver: yupResolver(schema), mode: 'onChange' });
-  // const roundDuration = watch(['roundDuration']);
   const {
     resetHandler,
     stopGameHandler,
     setRoundDuration,
     startHandler,
     allCellsStatuses,
-    gameIsRunning,
+    gameStatus,
     score,
   } = useGameContext();
   const [resultModalIsOpen, setResultModalIsOpen] = useState(false);
+
   const toggleResultModal = () => setResultModalIsOpen(!resultModalIsOpen);
-
-  useEffect(() => {
-    if (score.player === 10 || score.skyNet === 10) {
-      toggleResultModal();
-      stopGameHandler();
-    }
-  }, [score]);
-
-  const playAgain = () => {
-    resetHandler();
-    toggleResultModal();
-  };
 
   const timeChangeHandler = (value: string) => {
     setRoundDuration(value);
   };
 
   const win = score.player > score.skyNet;
+
+  const playAgain = () => {
+    resetHandler();
+    toggleResultModal();
+  };
 
   const playHandler = () => {
     if (isValid) {
@@ -100,6 +89,13 @@ const Game = () => {
       trigger();
     }
   };
+
+  useEffect(() => {
+    if (score.player === 10 || score.skyNet === 10) {
+      toggleResultModal();
+      stopGameHandler();
+    }
+  }, [score]);
 
   return (
     <MainWrapper>
@@ -136,7 +132,7 @@ const Game = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {gameIsRunning !== GameStatuses.pending ? (
+            {gameStatus !== GameStatuses.pending ? (
               <Button color="error" variant="contained" onClick={resetHandler}>
                 Reset
               </Button>
@@ -146,22 +142,18 @@ const Game = () => {
           </Box>
         </Controls>
       </form>
+
       <Board>
         {allCellsStatuses.map((status) => (
           <Cell key={useId()} status={status} />
         ))}
       </Board>
+
       <Modal open={resultModalIsOpen} onClose={toggleResultModal}>
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          component="h2"
-          color={win ? 'secondary' : 'error'}>
+        <Typography variant="h6" color={win ? 'secondary' : 'error'}>
           {win ? 'Congratulations! You won.' : 'Oh, what a pity! You lose.'}
         </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Would you like to try again?
-        </Typography>
+        <Typography sx={{ mt: 2 }}>Would you like to try again?</Typography>
         <Modal.Footer>
           <Button onClick={toggleResultModal} variant="outlined">
             Close

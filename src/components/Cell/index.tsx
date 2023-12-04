@@ -14,6 +14,10 @@ export enum CellStatus {
   lose = 'lose',
 }
 
+interface CellProps {
+  status: CellStatus;
+}
+
 interface StyledCellProps extends ButtonProps {
   status: CellStatus;
 }
@@ -42,31 +46,41 @@ const StyledCell = styled(Button, {
   }),
 }));
 
-interface CellProps {
-  status: CellStatus;
-}
-
 const Cell: FC<CellProps> = ({ status }) => {
   const [localStatus, setLocalStatus] = useState(status);
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { gameIsRunning, score, setScore, roundDuration } = useGameContext();
+  const { gameStatus, score, setScore, roundDuration } = useGameContext();
+
+  const clickHandler = () => {
+    setLocalStatus(CellStatus.win);
+    setScore((prevState) => {
+      if (prevState.player < 10) {
+        return {
+          ...prevState,
+          player: prevState.player + 1,
+        };
+      }
+      return prevState;
+    });
+    clearTimeout(roundTimeoutId.current);
+  };
 
   useEffect(() => {
     if (
       score.skyNet < 9 &&
       score.player < 10 &&
-      gameIsRunning === GameStatuses.running
+      gameStatus === GameStatuses.running
     ) {
       setLocalStatus(status);
     }
   }, [status]);
 
   useEffect(() => {
-    if (gameIsRunning === GameStatuses.pending) {
+    if (gameStatus === GameStatuses.pending) {
       clearInterval(roundTimeoutId.current);
       setLocalStatus(CellStatus.default);
     }
-  }, [gameIsRunning]);
+  }, [gameStatus]);
 
   useEffect(() => {
     if (localStatus === CellStatus.pending) {
@@ -84,20 +98,6 @@ const Cell: FC<CellProps> = ({ status }) => {
       }, Number(roundDuration));
     }
   }, [localStatus]);
-
-  const clickHandler = () => {
-    setLocalStatus(CellStatus.win);
-    setScore((prevState) => {
-      if (prevState.player < 10) {
-        return {
-          ...prevState,
-          player: prevState.player + 1,
-        };
-      }
-      return prevState;
-    });
-    clearTimeout(roundTimeoutId.current);
-  };
 
   return (
     <StyledCell

@@ -1,8 +1,8 @@
 import { createTheme } from '@mui/material/styles';
 
 import 'assets/fonts/Montserrat/style.scss';
-// @ts-ignore TODO
-import palette from 'theme/palette.module.scss';
+
+import palette from 'theme/palette.scss';
 
 interface CustomColor {
   white: string;
@@ -56,7 +56,7 @@ export const theme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          color: palette.secondary,
+          color: palette.main,
         },
       },
     },

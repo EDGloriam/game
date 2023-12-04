@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Typography, Collapse, IconButton, Drawer, Box } from '@mui/material';
+import { Typography, IconButton, Drawer, Box, Stack } from '@mui/material';
+import { Close } from '@mui/icons-material';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 
 import { GameProvider } from 'components/Game/context/GameProvider';
@@ -8,7 +9,7 @@ import Game from 'components/Game';
 const Home = () => {
   const [open, setOpen] = useState(false);
 
-  const handleToggle = () => {
+  const rulesToggleHandler = () => {
     setOpen(!open);
   };
 
@@ -16,14 +17,22 @@ const Home = () => {
     <>
       <Typography variant="h2">
         Mini-game
-        <IconButton onClick={handleToggle}>
+        <IconButton onClick={rulesToggleHandler}>
           <HelpOutlineRoundedIcon />
         </IconButton>
       </Typography>
-      <Drawer anchor="right" open={open} onClose={handleToggle}>
+      <Drawer anchor="right" open={open} onClose={rulesToggleHandler}>
         <Box sx={{ p: 2, maxWidth: 300 }}>
-          <Typography variant="h3">Rules</Typography>
-          <br />
+          <Stack
+            mb={2}
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center">
+            <Typography variant="h3">Rules</Typography>
+            <IconButton onClick={rulesToggleHandler}>
+              <Close />
+            </IconButton>
+          </Stack>
           <Typography>
             In this engaging mini-game, you find yourself facing a 10x10 grid of
             captivating blue squares. A mysterious <strong>Play</strong> button

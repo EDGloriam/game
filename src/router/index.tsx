@@ -1,14 +1,23 @@
-import React from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-import Home from 'pages/Home';
-import Typography from 'pages/Typography';
-import NotFound from 'pages/NotFound';
+const Home = React.lazy(() => import('pages/Home'));
+const Typography = React.lazy(() => import('pages/Typography'));
+const NotFound = React.lazy(() => import('pages/NotFound'));
 
 export const routes = {
   home: '/',
   typography: '/typography',
 };
+
+const StyledLoader = styled(CircularProgress)(({ theme }) => ({
+  position: 'absolute',
+  top: '50%',
+  right: '50%',
+  transform: 'translate(-50%, -50%)',
+}));
 
 export const router = createBrowserRouter([
   {
@@ -24,3 +33,9 @@ export const router = createBrowserRouter([
     element: <NotFound />,
   },
 ]);
+
+export const Routes = () => (
+  <Suspense fallback={<StyledLoader color="secondary" />}>
+    <RouterProvider router={router} />
+  </Suspense>
+);

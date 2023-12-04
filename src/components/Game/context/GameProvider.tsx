@@ -10,7 +10,9 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { getInitialPositions } from 'helpers/getInitialPositions';
+import { delay } from 'helpers/delay';
 import { CellStatus } from 'components/Cell';
 
 interface GameProviderProps {
@@ -39,7 +41,7 @@ interface GameContextType {
   startHandler: () => void;
   stopGameHandler: () => void;
   resetHandler: () => void;
-  gameIsRunning: GameStatuses;
+  gameStatus: GameStatuses;
 }
 
 export const GameContext = createContext({} as GameContextType);
@@ -53,11 +55,6 @@ const initialScore = {
 
 const initialCells = Array(100).fill(CellStatus.default);
 
-const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
 export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [score, setScore] = useState<Score>(initialScore);
   const [allCellsStatuses, setAllCellsStatuses] =
@@ -65,7 +62,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [cellsForGame, setCellsForGame] = useState<number[]>(
     getInitialPositions(),
   );
-  const [gameIsRunning, setGameIsRunning] = useState<GameStatuses>(
+  const [gameStatus, setGameStatus] = useState<GameStatuses>(
     GameStatuses.pending,
   );
   const gameIsRunningRef = useRef(true);
@@ -73,20 +70,20 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [roundDuration, setRoundDuration] = useState<string>('');
 
   const resetHandler = () => {
-    setGameIsRunning(GameStatuses.pending);
+    setGameStatus(GameStatuses.pending);
     gameIsRunningRef.current = false;
   };
 
   useEffect(() => {
-    if (gameIsRunning === GameStatuses.pending) {
+    if (gameStatus === GameStatuses.pending) {
       setScore(initialScore);
       setAllCellsStatuses(initialCells);
       setCellsForGame(getInitialPositions);
     }
-  }, [gameIsRunning]);
+  }, [gameStatus]);
 
   const stopGameHandler = () => {
-    setGameIsRunning(GameStatuses.stopped);
+    setGameStatus(GameStatuses.stopped);
   };
 
   const roundHandler = () => {
@@ -103,9 +100,8 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   };
 
   const startHandler = () => {
-    console.log('RUN!');
     gameIsRunningRef.current = true;
-    setGameIsRunning(GameStatuses.running);
+    setGameStatus(GameStatuses.running);
   };
 
   useEffect(() => {
@@ -116,18 +112,14 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const gameLoop = async () => {
-      while (
-        gameIsRunningRef.current &&
-        gameIsRunning === GameStatuses.running
-      ) {
-        console.log('game loop');
+      while (gameIsRunningRef.current && gameStatus === GameStatuses.running) {
         // eslint-disable-next-line no-await-in-loop
         await delay(Number(roundDuration));
         roundHandler();
       }
     };
     gameLoop();
-  }, [gameIsRunning]);
+  }, [gameStatus]);
 
   const contextValue = useMemo(
     () => ({
@@ -135,7 +127,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
       setRoundDuration,
       startHandler,
       resetHandler,
-      gameIsRunning,
+      gameStatus,
       stopGameHandler,
       allCellsStatuses,
       setAllCellsStatuses,
@@ -149,7 +141,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
       setRoundDuration,
       startHandler,
       resetHandler,
-      gameIsRunning,
+      gameStatus,
       stopGameHandler,
       score,
       setScore,
