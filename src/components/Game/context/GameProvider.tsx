@@ -36,8 +36,8 @@ interface GameContextType {
   allCellsStatuses: CellStatus[];
   setAllCellsStatuses: Dispatch<SetStateAction<CellStatus[]>>;
   currentCellIndex?: number;
-  roundDuration: string;
-  setRoundDuration: Dispatch<SetStateAction<string>>;
+  roundDuration: number | undefined;
+  setRoundDuration: Dispatch<SetStateAction<number | undefined>>;
   startHandler: () => void;
   stopGameHandler: () => void;
   resetHandler: () => void;
@@ -67,7 +67,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   );
   const gameIsRunningRef = useRef(true);
 
-  const [roundDuration, setRoundDuration] = useState<string>('');
+  const [roundDuration, setRoundDuration] = useState<number | undefined>();
 
   const resetHandler = () => {
     setGameStatus(GameStatuses.pending);
@@ -78,7 +78,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     if (gameStatus === GameStatuses.pending) {
       setScore(initialScore);
       setAllCellsStatuses(initialCells);
-      setCellsForGame(getInitialPositions);
+      setCellsForGame(getInitialPositions());
     }
   }, [gameStatus]);
 
@@ -114,7 +114,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
     const gameLoop = async () => {
       while (gameIsRunningRef.current && gameStatus === GameStatuses.running) {
         // eslint-disable-next-line no-await-in-loop
-        await delay(Number(roundDuration));
+        await delay(roundDuration);
         roundHandler();
       }
     };

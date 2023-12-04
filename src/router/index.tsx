@@ -2,7 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Layout from '../helpers/containers/Layout';
+
+import Layout from 'containers/Layout';
 
 const Home = lazy(() => import('pages/Home'));
 const Typography = lazy(() => import('pages/Typography'));

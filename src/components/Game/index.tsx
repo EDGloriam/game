@@ -78,7 +78,7 @@ const Game = () => {
   const toggleResultModal = () => setResultModalIsOpen(!resultModalIsOpen);
 
   const timeChangeHandler = (value: string) => {
-    setRoundDuration(value);
+    setRoundDuration(Number(value));
   };
 
   const win = score.player > score.skyNet;

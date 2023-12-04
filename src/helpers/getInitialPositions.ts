@@ -1,7 +1,7 @@
-import { getRandomIndex } from 'helpers/getRandomIndex';
+import { getRandomIndex } from './getRandomIndex';
 
-export const getInitialPositions = () =>
-  Array(19)
+export const getInitialPositions = (size: number = 20) =>
+  Array(size)
     .fill(undefined)
     .reduce((previousValue) => {
       const newIndexForCell = getRandomIndex(previousValue);

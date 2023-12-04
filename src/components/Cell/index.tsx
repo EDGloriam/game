@@ -95,7 +95,7 @@ const Cell: FC<CellProps> = ({ status }) => {
           return prevState;
         });
         setLocalStatus(CellStatus.lose);
-      }, Number(roundDuration));
+      }, roundDuration);
     }
   }, [localStatus]);
 
