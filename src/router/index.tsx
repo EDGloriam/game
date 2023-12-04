@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Layout from '../helpers/containers/Layout';
 
 const Home = lazy(() => import('pages/Home'));
 const Typography = lazy(() => import('pages/Typography'));
@@ -36,6 +37,8 @@ export const router = createBrowserRouter([
 
 export const Routes = () => (
   <Suspense fallback={<StyledLoader color="secondary" />}>
-    <RouterProvider router={router} />
+    <Layout>
+      <RouterProvider router={router} />
+    </Layout>
   </Suspense>
 );
