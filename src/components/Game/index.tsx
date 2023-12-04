@@ -38,18 +38,24 @@ const Board = styled('div')(({ theme }) => ({
   marginTop: 10,
 }));
 
-const Row = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
+const Score = styled(Typography)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: '1fr 30px 10px 30px',
+  gap: '2px',
+  justifyItems: 'center',
 }));
 
 const Controls = styled('div')(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
+  display: 'grid',
+  gridTemplateColumns: '160px 1fr 160px',
+  justifyItems: 'center',
   alignItems: 'flex-end',
   marginTop: 20,
   width: '100%',
+
+  '& .MuiButton-root': {
+    justifySelf: 'end',
+  },
 }));
 
 const Game = () => {
@@ -127,19 +133,17 @@ const Game = () => {
             )}
           />
 
-          <Typography variant="h3">
-            Score: {score.player} / {score.skyNet}
-          </Typography>
+          <Score variant="h3">
+            Score: <span>{score.player}</span> /<span>{score.skyNet}</span>
+          </Score>
 
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {gameStatus !== GameStatuses.pending ? (
-              <Button color="error" variant="contained" onClick={resetHandler}>
-                Reset
-              </Button>
-            ) : (
-              <Button onClick={playHandler}>Play</Button>
-            )}
-          </Box>
+          {gameStatus !== GameStatuses.pending ? (
+            <Button color="error" variant="contained" onClick={resetHandler}>
+              Reset
+            </Button>
+          ) : (
+            <Button onClick={playHandler}>Play</Button>
+          )}
         </Controls>
       </form>
 

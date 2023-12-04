@@ -1,11 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const Home = React.lazy(() => import('pages/Home'));
-const Typography = React.lazy(() => import('pages/Typography'));
-const NotFound = React.lazy(() => import('pages/NotFound'));
+const Home = lazy(() => import('pages/Home'));
+const Typography = lazy(() => import('pages/Typography'));
+const NotFound = lazy(() => import('pages/NotFound'));
 
 export const routes = {
   home: '/',
