@@ -1,13 +1,17 @@
 import React, { ChangeEvent, useEffect, useId, useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { styled } from '@mui/material/styles';
 
 import Cell from 'components/Cell';
-import { useGameContext } from 'components/Game/context/GameProvider';
+import {
+  GameStatuses,
+  useGameContext,
+} from 'components/Game/context/GameProvider';
 import Modal from 'components/Modal';
+import Button from 'components/Button';
 
 interface IFormInput {
   roundDuration: string;
@@ -50,15 +54,20 @@ const Controls = styled('div')(({ theme }) => ({
 
 const Game = () => {
   const {
+    watch,
+    register,
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<IFormInput>({ resolver: yupResolver(schema) });
+    trigger,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm<IFormInput>({ resolver: yupResolver(schema), mode: 'onChange' });
+  // const roundDuration = watch(['roundDuration']);
   const {
+    resetHandler,
     stopGameHandler,
     setRoundDuration,
     startHandler,
-    resetHandler,
     allCellsStatuses,
     gameIsRunning,
     score,
@@ -78,19 +87,23 @@ const Game = () => {
     toggleResultModal();
   };
 
-  const onSubmit = ({ roundDuration }: IFormInput) => {
-    setRoundDuration(roundDuration);
-    startHandler();
-  };
   const timeChangeHandler = (value: string) => {
     setRoundDuration(value);
   };
 
   const win = score.player > score.skyNet;
 
+  const playHandler = () => {
+    if (isValid) {
+      startHandler();
+    } else {
+      trigger();
+    }
+  };
+
   return (
     <MainWrapper>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form>
         <Controls>
           <Controller
             control={control}
@@ -123,14 +136,12 @@ const Game = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {gameIsRunning ? (
+            {gameIsRunning !== GameStatuses.pending ? (
               <Button variant="contained" onClick={resetHandler}>
-                Stop & Reset
+                Reset
               </Button>
             ) : (
-              <Button variant="contained" type="submit">
-                Start
-              </Button>
+              <Button onClick={playHandler}>Play</Button>
             )}
           </Box>
         </Controls>
@@ -155,9 +166,7 @@ const Game = () => {
           <Button onClick={toggleResultModal} variant="outlined">
             Close
           </Button>
-          <Button onClick={playAgain} variant="contained">
-            Play again
-          </Button>
+          <Button onClick={playAgain}>Play again</Button>
         </Modal.Footer>
       </Modal>
     </MainWrapper>

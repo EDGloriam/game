@@ -56,8 +56,21 @@ export const theme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          // Customize the icon color, size, etc.
           color: palette.secondary,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        containedPrimary: {
+          color: palette.white,
+          backgroundColor: palette.main,
+          '&:hover': {
+            backgroundColor: palette.mainHover,
+          },
+          '&:active': {
+            backgroundColor: palette.mainHover,
+          },
         },
       },
     },

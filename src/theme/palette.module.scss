@@ -1,4 +1,5 @@
 $main: #48af32;
+$main-hover: #48AF32EF;
 $secondary: #1297ef;
 $error: #e75454;
 $warning: #ffa700;
@@ -6,6 +7,7 @@ $white: #fff;
 
 :export {
   main: $main;
+  mainHover: $main-hover;
   secondary: $secondary;
   error: $error;
   warning: $warning;

@@ -22,6 +22,12 @@ export type Score = {
   skyNet: number;
 };
 
+export enum GameStatuses {
+  pending = 'pending',
+  running = 'running',
+  stopped = 'stopped',
+}
+
 interface GameContextType {
   score: Score;
   setScore: Dispatch<SetStateAction<Score>>;
@@ -33,7 +39,7 @@ interface GameContextType {
   startHandler: () => void;
   stopGameHandler: () => void;
   resetHandler: () => void;
-  gameIsRunning: boolean;
+  gameIsRunning: GameStatuses;
 }
 
 export const GameContext = createContext({} as GameContextType);
@@ -59,19 +65,28 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [cellsForGame, setCellsForGame] = useState<number[]>(
     getInitialPositions(),
   );
-  const [gameIsRunning, setGameIsRunning] = useState(false);
+  const [gameIsRunning, setGameIsRunning] = useState<GameStatuses>(
+    GameStatuses.pending,
+  );
   const gameIsRunningRef = useRef(true);
 
   const [roundDuration, setRoundDuration] = useState<string>('');
 
   const resetHandler = () => {
-    setScore(initialScore);
-    setGameIsRunning(false);
-    setAllCellsStatuses(initialCells);
+    setGameIsRunning(GameStatuses.pending);
+    gameIsRunningRef.current = false;
   };
 
+  useEffect(() => {
+    if (gameIsRunning === GameStatuses.pending) {
+      setScore(initialScore);
+      setAllCellsStatuses(initialCells);
+      setCellsForGame(getInitialPositions);
+    }
+  }, [gameIsRunning]);
+
   const stopGameHandler = () => {
-    setGameIsRunning(false);
+    setGameIsRunning(GameStatuses.stopped);
   };
 
   const roundHandler = () => {
@@ -88,7 +103,9 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   };
 
   const startHandler = () => {
-    setGameIsRunning(true);
+    console.log('RUN!');
+    gameIsRunningRef.current = true;
+    setGameIsRunning(GameStatuses.running);
   };
 
   useEffect(() => {
@@ -99,7 +116,11 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const gameLoop = async () => {
-      while (gameIsRunningRef.current && gameIsRunning) {
+      while (
+        gameIsRunningRef.current &&
+        gameIsRunning === GameStatuses.running
+      ) {
+        console.log('11111');
         // eslint-disable-next-line no-await-in-loop
         await delay(Number(roundDuration));
         roundHandler();
