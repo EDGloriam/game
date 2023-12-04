@@ -2,7 +2,10 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import { useGameContext } from 'components/Game/context/GameProvider';
+import {
+  GameStatuses,
+  useGameContext,
+} from 'components/Game/context/GameProvider';
 
 export enum CellStatus {
   default = 'default',
@@ -46,13 +49,24 @@ interface CellProps {
 const Cell: FC<CellProps> = ({ status }) => {
   const [localStatus, setLocalStatus] = useState(status);
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { score, setScore, roundDuration } = useGameContext();
+  const { gameIsRunning, score, setScore, roundDuration } = useGameContext();
 
   useEffect(() => {
-    if (score.skyNet < 9 && score.player < 10) {
+    if (
+      score.skyNet < 9 &&
+      score.player < 10 &&
+      gameIsRunning === GameStatuses.running
+    ) {
       setLocalStatus(status);
     }
   }, [status]);
+
+  useEffect(() => {
+    if (gameIsRunning === GameStatuses.pending) {
+      clearInterval(roundTimeoutId.current);
+      setLocalStatus(CellStatus.default);
+    }
+  }, [gameIsRunning]);
 
   useEffect(() => {
     if (localStatus === CellStatus.pending) {

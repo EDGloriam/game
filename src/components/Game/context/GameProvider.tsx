@@ -120,7 +120,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
         gameIsRunningRef.current &&
         gameIsRunning === GameStatuses.running
       ) {
-        console.log('11111');
+        console.log('game loop');
         // eslint-disable-next-line no-await-in-loop
         await delay(Number(roundDuration));
         roundHandler();

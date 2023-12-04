@@ -83,7 +83,7 @@ const Game = () => {
   }, [score]);
 
   const playAgain = () => {
-    startHandler();
+    resetHandler();
     toggleResultModal();
   };
 
@@ -137,7 +137,7 @@ const Game = () => {
 
           <Box sx={{ display: 'flex', gap: 1 }}>
             {gameIsRunning !== GameStatuses.pending ? (
-              <Button variant="contained" onClick={resetHandler}>
+              <Button color="error" variant="contained" onClick={resetHandler}>
                 Reset
               </Button>
             ) : (
