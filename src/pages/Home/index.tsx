@@ -5,6 +5,7 @@ import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 
 import { GameProvider } from 'components/Game/context/GameProvider';
 import Game from 'components/Game';
+import { SCORE_LIMIT } from 'constants/Game';
 
 const Home = () => {
   const [open, setOpen] = useState(false);
@@ -47,11 +48,12 @@ const Home = () => {
             computer&apos;s score. <br />
             <br />
             The race against time and wits ensues until either you or the
-            computer amass <strong>10 points</strong>, heralding the end of this
-            riveting game. In the end window emerges, sharing the tale of
-            victory or defeat, urging you to relive the challenge or bask in the
-            sweet taste of triumph. The saga unfolds with each click, and only
-            the quickest will emerge victorious in this vibrant grid of chance.
+            computer amass <strong>{SCORE_LIMIT} points</strong>, heralding the
+            end of this riveting game. In the end window emerges, sharing the
+            tale of victory or defeat, urging you to relive the challenge or
+            bask in the sweet taste of triumph. The saga unfolds with each
+            click, and only the quickest will emerge victorious in this vibrant
+            grid of chance.
           </Typography>
         </Box>
       </Drawer>

@@ -6,6 +6,7 @@ import {
   GameStatuses,
   useGameContext,
 } from 'components/Game/context/GameProvider';
+import { SCORE_LIMIT } from 'constants/Game';
 
 export enum CellStatus {
   default = 'default',
@@ -54,7 +55,7 @@ const Cell: FC<CellProps> = ({ status }) => {
   const clickHandler = () => {
     setLocalStatus(CellStatus.win);
     setScore((prevState) => {
-      if (prevState.player < 10) {
+      if (prevState.player < SCORE_LIMIT) {
         return {
           ...prevState,
           player: prevState.player + 1,
@@ -67,8 +68,8 @@ const Cell: FC<CellProps> = ({ status }) => {
 
   useEffect(() => {
     if (
-      score.skyNet < 9 &&
-      score.player < 10 &&
+      score.skyNet < SCORE_LIMIT - 1 &&
+      score.player < SCORE_LIMIT &&
       gameStatus === GameStatuses.running
     ) {
       setLocalStatus(status);
@@ -86,7 +87,7 @@ const Cell: FC<CellProps> = ({ status }) => {
     if (localStatus === CellStatus.pending) {
       roundTimeoutId.current = setTimeout(() => {
         setScore((prevState) => {
-          if (prevState.skyNet < 10) {
+          if (prevState.skyNet < SCORE_LIMIT) {
             return {
               ...prevState,
               skyNet: prevState.skyNet + 1,

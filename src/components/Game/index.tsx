@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useId, useState } from 'react';
-import { Box, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -12,6 +12,7 @@ import {
 } from 'components/Game/context/GameProvider';
 import Modal from 'components/Modal';
 import Button from 'components/Button';
+import { SCORE_LIMIT } from 'constants/Game';
 
 interface IFormInput {
   roundDuration: string;
@@ -97,7 +98,7 @@ const Game = () => {
   };
 
   useEffect(() => {
-    if (score.player === 10 || score.skyNet === 10) {
+    if (score.player === SCORE_LIMIT || score.skyNet === SCORE_LIMIT) {
       toggleResultModal();
       stopGameHandler();
     }

@@ -13,9 +13,9 @@ import {
 } from 'react';
 
 import { CellStatus } from 'components/Cell';
-import { useGame } from '../hook/useGame';
-import { getInitialPositions } from '../../../helpers/getInitialPositions';
-import { delay } from '../../../helpers/delay';
+import { getInitialPositions } from 'helpers/getInitialPositions';
+import { delay } from 'helpers/delay';
+import { SCORE_LIMIT } from 'constants/Game';
 
 interface GameProviderProps {
   children?: ReactNode;
@@ -58,18 +58,6 @@ const initialScore = {
 const initialCells = Array(100).fill(CellStatus.default);
 
 export const GameProvider: FC<GameProviderProps> = ({ children }) => {
-  // const {
-  //   allCellsStatuses,
-  //   setAllCellsStatuses,
-  //   roundDuration,
-  //   setRoundDuration,
-  //   startHandler,
-  //   resetHandler,
-  //   gameStatus,
-  //   stopGameHandler,
-  //   score,
-  //   setScore,
-  // } = useGame();
   const [score, setScore] = useState<Score>(initialScore);
   const [allCellsStatuses, setAllCellsStatuses] =
     useState<CellStatus[]>(initialCells);
@@ -119,7 +107,7 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (score.player === 10 || score.skyNet === 10) {
+    if (score.player === SCORE_LIMIT || score.skyNet === SCORE_LIMIT) {
       gameIsRunningRef.current = false;
     }
   }, [score]);
