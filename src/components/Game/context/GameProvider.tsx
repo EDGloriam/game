@@ -4,18 +4,17 @@ import {
   FC,
   ReactNode,
   SetStateAction,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
 import { CellStatus } from 'components/Cell';
-import { getInitialPositions } from 'helpers/getInitialPositions';
-import { delay } from 'helpers/delay';
-import { SCORE_LIMIT } from 'constants/Game';
+import {
+  initialCells,
+  initialScore,
+  useGame,
+} from 'components/Game/hook/useGame';
 
 interface GameProviderProps {
   children?: ReactNode;
@@ -50,78 +49,22 @@ export const GameContext = createContext({} as GameContextType);
 
 export const useGameContext = () => useContext(GameContext);
 
-const initialScore = {
-  player: 0,
-  skyNet: 0,
-};
-
-const initialCells = Array(100).fill(CellStatus.default);
-
 export const GameProvider: FC<GameProviderProps> = ({ children }) => {
   const [score, setScore] = useState<Score>(initialScore);
+  const [roundDuration, setRoundDuration] = useState<number | undefined>();
   const [allCellsStatuses, setAllCellsStatuses] =
     useState<CellStatus[]>(initialCells);
-  const [cellsForGame, setCellsForGame] = useState<number[]>(
-    getInitialPositions(),
-  );
   const [gameStatus, setGameStatus] = useState<GameStatuses>(
     GameStatuses.pending,
   );
-  const gameIsRunningRef = useRef(true);
-
-  const [roundDuration, setRoundDuration] = useState<number | undefined>();
-
-  const resetHandler = useCallback(() => {
-    setGameStatus(GameStatuses.pending);
-    gameIsRunningRef.current = false;
-  }, []);
-
-  useEffect(() => {
-    if (gameStatus === GameStatuses.pending) {
-      setScore(initialScore);
-      setAllCellsStatuses(initialCells);
-      setCellsForGame(getInitialPositions());
-    }
-  }, [gameStatus]);
-
-  const stopGameHandler = useCallback(() => {
-    setGameStatus(GameStatuses.stopped);
-  }, []);
-
-  const roundHandler = () => {
-    const currentCellIndex = cellsForGame.shift();
-    setAllCellsStatuses((prevState) =>
-      prevState.map((cell, index) => {
-        if (index === currentCellIndex) {
-          return CellStatus.pending;
-        }
-
-        return cell;
-      }),
-    );
-  };
-
-  const startHandler = useCallback(() => {
-    gameIsRunningRef.current = true;
-    setGameStatus(GameStatuses.running);
-  }, []);
-
-  useEffect(() => {
-    if (score.player === SCORE_LIMIT || score.skyNet === SCORE_LIMIT) {
-      gameIsRunningRef.current = false;
-    }
-  }, [score]);
-
-  useEffect(() => {
-    const gameLoop = async () => {
-      while (gameIsRunningRef.current && gameStatus === GameStatuses.running) {
-        // eslint-disable-next-line no-await-in-loop
-        await delay(roundDuration);
-        roundHandler();
-      }
-    };
-    gameLoop();
-  }, [gameStatus]);
+  const { startHandler, resetHandler, stopGameHandler } = useGame({
+    roundDuration,
+    score,
+    setScore,
+    setAllCellsStatuses,
+    setGameStatus,
+    gameStatus,
+  });
 
   const contextValue = useMemo(
     () => ({
@@ -129,8 +72,8 @@ export const GameProvider: FC<GameProviderProps> = ({ children }) => {
       setRoundDuration,
       startHandler,
       resetHandler,
-      gameStatus,
       stopGameHandler,
+      gameStatus,
       allCellsStatuses,
       setAllCellsStatuses,
       score,
