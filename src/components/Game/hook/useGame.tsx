@@ -1,72 +1,40 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { SCORE_LIMIT } from 'constants/Game';
 import { getInitialPositions } from 'helpers/getInitialPositions';
 import { delay } from 'helpers/delay';
-import { CellStatus } from 'components/Cell';
-import { GameStatuses, Score } from 'components/Game/context/GameProvider';
+import { selectorsGame } from 'app/game/selectors';
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { GameStatuses, resetGame, updateGameStatus } from 'app/game/gameSlice';
+import { resetBoard, updateCellsStatuses } from 'app/game/boardSlice';
 
-export const initialScore = {
-  player: 0,
-  skyNet: 0,
-};
-
-export const initialCells = Array(100).fill(CellStatus.default);
-
-interface UseGame {
-  score: Score;
-  setScore: Dispatch<SetStateAction<Score>>;
-  setAllCellsStatuses: Dispatch<SetStateAction<CellStatus[]>>;
-  roundDuration: number | undefined;
-  gameStatus: GameStatuses;
-  setGameStatus: Dispatch<SetStateAction<GameStatuses>>;
-}
-
-export const useGame = ({
-  roundDuration,
-  score,
-  setScore,
-  setAllCellsStatuses,
-  setGameStatus,
-  gameStatus,
-}: UseGame) => {
+export const useGame = () => {
+  const score = useAppSelector(selectorsGame.score);
+  const gameStatus = useAppSelector(selectorsGame.gameStatus);
+  const roundDuration = useAppSelector(selectorsGame.roundDuration);
+  const dispatch = useAppDispatch();
   const gameIsRunningRef = useRef(true);
   const [cellsForGame, setCellsForGame] = useState<number[]>(
     getInitialPositions(),
   );
 
   const resetHandler = useCallback(() => {
-    setGameStatus(GameStatuses.pending);
+    dispatch(updateGameStatus(GameStatuses.pending));
     gameIsRunningRef.current = false;
   }, []);
 
   const stopGameHandler = useCallback(() => {
-    setGameStatus(GameStatuses.stopped);
+    dispatch(updateGameStatus(GameStatuses.stopped));
   }, []);
 
   const startHandler = useCallback(() => {
     gameIsRunningRef.current = true;
-    setGameStatus(GameStatuses.running);
+    dispatch(updateGameStatus(GameStatuses.running));
   }, []);
 
   const roundHandler = () => {
     const currentCellIndex = cellsForGame.shift();
-    setAllCellsStatuses((prevState) =>
-      prevState.map((cell, index) => {
-        if (index === currentCellIndex) {
-          return CellStatus.pending;
-        }
-
-        return cell;
-      }),
-    );
+    dispatch(updateCellsStatuses(currentCellIndex));
   };
 
   useEffect(() => {
@@ -86,8 +54,8 @@ export const useGame = ({
     };
 
     if (gameStatus === GameStatuses.pending) {
-      setScore(initialScore);
-      setAllCellsStatuses(initialCells);
+      dispatch(resetGame());
+      dispatch(resetBoard());
       setCellsForGame(getInitialPositions());
     } else {
       gameLoop();

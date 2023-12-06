@@ -3,7 +3,6 @@ import { Typography, IconButton, Drawer, Box, Stack } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 
-import { GameProvider } from 'components/Game/context/GameProvider';
 import Game from 'components/Game';
 import { SCORE_LIMIT } from 'constants/Game';
 
@@ -57,9 +56,7 @@ const Home = () => {
           </Typography>
         </Box>
       </Drawer>
-      <GameProvider>
-        <Game />
-      </GameProvider>
+      <Game />
     </>
   );
 };

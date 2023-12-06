@@ -6,13 +6,13 @@ import * as yup from 'yup';
 import { styled } from '@mui/material/styles';
 
 import Cell from 'components/Cell';
-import {
-  GameStatuses,
-  useGameContext,
-} from 'components/Game/context/GameProvider';
 import Modal from 'components/Modal';
 import Button from 'components/Button';
 import { SCORE_LIMIT } from 'constants/Game';
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { selectorsGame } from 'app/game/selectors';
+import { useGame } from 'components/Game/hook/useGame';
+import { GameStatuses, updateRoundDurationTime } from 'app/game/gameSlice';
 
 interface IFormInput {
   roundDuration: string;
@@ -60,26 +60,22 @@ const Controls = styled('div')(({ theme }) => ({
 }));
 
 const Game = () => {
+  const dispatch = useAppDispatch();
   const {
     control,
     trigger,
     formState: { errors, isValid },
   } = useForm<IFormInput>({ resolver: yupResolver(schema), mode: 'onChange' });
-  const {
-    resetHandler,
-    stopGameHandler,
-    setRoundDuration,
-    startHandler,
-    allCellsStatuses,
-    gameStatus,
-    score,
-  } = useGameContext();
+  const score = useAppSelector(selectorsGame.score);
+  const cells = useAppSelector(selectorsGame.cells);
+  const gameStatus = useAppSelector(selectorsGame.gameStatus);
+  const { resetHandler, stopGameHandler, startHandler } = useGame();
   const [resultModalIsOpen, setResultModalIsOpen] = useState(false);
 
   const toggleResultModal = () => setResultModalIsOpen(!resultModalIsOpen);
 
   const timeChangeHandler = (value: string) => {
-    setRoundDuration(Number(value));
+    dispatch(updateRoundDurationTime(value));
   };
 
   const win = score.player > score.skyNet;
@@ -152,7 +148,7 @@ const Game = () => {
       </form>
 
       <Board>
-        {allCellsStatuses.map((status) => (
+        {cells.map((status) => (
           <Cell key={useId()} status={status} />
         ))}
       </Board>

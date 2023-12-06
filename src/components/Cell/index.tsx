@@ -2,18 +2,11 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import {
-  GameStatuses,
-  useGameContext,
-} from 'components/Game/context/GameProvider';
 import { SCORE_LIMIT } from 'constants/Game';
-
-export enum CellStatus {
-  default = 'default',
-  pending = 'pending',
-  win = 'win',
-  lose = 'lose',
-}
+import { useAppDispatch, useAppSelector } from 'app/hooks';
+import { selectorsGame } from 'app/game/selectors';
+import { GameStatuses, pointToPlayer, pointToSkyNet } from 'app/game/gameSlice';
+import { CellStatus } from 'app/game/boardSlice';
 
 interface CellProps {
   status: CellStatus;
@@ -48,21 +41,16 @@ const StyledCell = styled(Button, {
 }));
 
 const Cell: FC<CellProps> = ({ status }) => {
+  const score = useAppSelector(selectorsGame.score);
+  const gameStatus = useAppSelector(selectorsGame.gameStatus);
+  const roundDuration = useAppSelector(selectorsGame.roundDuration);
+  const dispatch = useAppDispatch();
   const [localStatus, setLocalStatus] = useState(status);
   const roundTimeoutId = useRef<ReturnType<typeof setTimeout>>();
-  const { gameStatus, score, setScore, roundDuration } = useGameContext();
 
   const clickHandler = () => {
     setLocalStatus(CellStatus.win);
-    setScore((prevState) => {
-      if (prevState.player < SCORE_LIMIT) {
-        return {
-          ...prevState,
-          player: prevState.player + 1,
-        };
-      }
-      return prevState;
-    });
+    dispatch(pointToPlayer());
     clearTimeout(roundTimeoutId.current);
   };
 
@@ -86,15 +74,7 @@ const Cell: FC<CellProps> = ({ status }) => {
   useEffect(() => {
     if (localStatus === CellStatus.pending) {
       roundTimeoutId.current = setTimeout(() => {
-        setScore((prevState) => {
-          if (prevState.skyNet < SCORE_LIMIT) {
-            return {
-              ...prevState,
-              skyNet: prevState.skyNet + 1,
-            };
-          }
-          return prevState;
-        });
+        dispatch(pointToSkyNet());
         setLocalStatus(CellStatus.lose);
       }, roundDuration);
     }
