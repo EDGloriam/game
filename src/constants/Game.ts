@@ -1,1 +1,1 @@
-export const SCORE_LIMIT = 4;
+export const SCORE_LIMIT = 10;
