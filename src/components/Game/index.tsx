@@ -113,8 +113,8 @@ const Game = () => {
               fieldState: { invalid, isTouched, isDirty, error },
             }) => (
               <TextField
-                data-testid="time"
                 {...field}
+                disabled={gameStatus !== GameStatuses.pending}
                 label="Time (ms)"
                 placeholder="Enter time"
                 type="text"
@@ -131,7 +131,7 @@ const Game = () => {
             )}
           />
 
-          <Score variant="h3" data-testid="score">
+          <Score variant="h3">
             Score: <span>{score.player}</span> /<span>{score.skyNet}</span>
           </Score>
 
@@ -140,9 +140,7 @@ const Game = () => {
               Reset
             </Button>
           ) : (
-            <Button onClick={playHandler} data-testid="play">
-              Play
-            </Button>
+            <Button onClick={playHandler}>Play</Button>
           )}
         </Controls>
       </form>

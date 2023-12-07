@@ -11,20 +11,20 @@ interface Board {
   cells: CellStatus[];
 }
 
-export const initialState: Board = {
+export const initialBoardState: Board = {
   cells: Array(100).fill(CellStatus.default),
 };
 
 export const boardSlice = createSlice({
   name: 'board',
-  initialState,
+  initialState: initialBoardState,
   reducers: {
     updateCellsStatuses: (state, action: PayloadAction<number | undefined>) => {
       if (action.payload) {
         state.cells[action.payload] = CellStatus.pending;
       }
     },
-    resetBoard: () => initialState,
+    resetBoard: () => initialBoardState,
   },
 });
 

@@ -15,7 +15,7 @@ export interface Game {
   gameStatus: GameStatuses;
 }
 
-export const initialState: Game = {
+export const initialGameState: Game = {
   score: {
     player: 0,
     skyNet: 0,
@@ -26,7 +26,7 @@ export const initialState: Game = {
 
 export const gameSlice = createSlice({
   name: 'game',
-  initialState,
+  initialState: initialGameState,
   reducers: {
     pointToPlayer: (state) => {
       state.score.player += 1;
@@ -40,7 +40,10 @@ export const gameSlice = createSlice({
     updateRoundDurationTime: (state, action: PayloadAction<string>) => {
       state.roundDuration = Number(action.payload);
     },
-    resetGame: () => initialState,
+    resetGame: (state) => ({
+      ...initialGameState,
+      roundDuration: state.roundDuration,
+    }),
   },
 });
 

@@ -1,24 +1,25 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { render, screen } from '@testing-library/react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import '@testing-library/jest-dom';
 
-import Home from './index';
+import Home from 'pages/Home';
+import { renderWithProviders } from 'utils/test-utils';
 
 describe('Home', () => {
   test('renders necessary elements', () => {
-    render(<Home />);
-
-    const roundDurationInput = screen.getByTestId('time');
+    const { getByLabelText, getAllByTestId, getByText } = renderWithProviders(
+      <Home />,
+      {},
+    );
+    const roundDurationInput = getByLabelText('Time (ms)');
     expect(roundDurationInput).toBeInTheDocument();
 
-    const scoreText = screen.getByTestId('score');
+    const scoreText = getByText((content) => content.startsWith('Score: '));
     expect(scoreText).toBeInTheDocument();
 
-    const playButton = screen.getByTestId('play');
+    const playButton = getByText('Play');
     expect(playButton).toBeInTheDocument();
 
-    const cells = screen.getAllByTestId('cell');
+    const cells = getAllByTestId('cell');
     expect(cells).toHaveLength(100);
   });
 });
